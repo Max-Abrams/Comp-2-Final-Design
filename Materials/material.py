@@ -2,6 +2,8 @@ import sys
 import os
 from spacegroup import SpaceGroup
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 #Kept getting import error for db. So needed Gemini to help me with this
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -11,17 +13,19 @@ from databases.MaterialDB import db
 
 class Material:
     #I presume we are keying this by formula name. The IDs are kind of weird and non-user friedly
-    def __init__(self, formula_name):
+    def __init__(self, formula_name, data_row = None):
         self.name = formula_name
         
-        #unfortunatley some formulas appear twice, so we need to handle that
-        #Also need to handle the case where no matches are found. Thats an easy error handle
+        # Only search the DB if data_row wasn't passed in
+        if data_row is None:
+            #unfortunatley some formulas appear twice, so we need to handle that
+            #Also need to handle the case where no matches are found. Thats an easy error handle
 
 
-        #so later this look up will by handled using a Hash Table
-        matches = db.df[db.df['formula'] == formula_name]
-        #Extract the first row found. 
-        data_row = matches.iloc[0]
+            #so later this look up will by handled using a Hash Table
+            matches = db.df[db.df['formula'] == formula_name]
+            #Extract the first row found. 
+            data_row = matches.iloc[0]
 
         # 4. Assign attributes from the row
         self.density = data_row['density']
@@ -41,14 +45,3 @@ class Material:
         for atom in self.clean_atoms:
             print(f"- {atom}")
         return "Done"
-    
-
-
-
-if __name__ == "__main__":
-    try:
-        #example look up
-        my_mat = Material("DyB6")
-        print(my_mat.display())
-    except:
-        print("Material not found in database.")
