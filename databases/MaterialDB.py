@@ -1,6 +1,8 @@
+import os
 import pandas as pd
 
-DATA_PATH = "databases/Materials.csv"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "Materials.csv")
 
 class MaterialDatabase:
     def __init__(self, file_path):

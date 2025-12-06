@@ -1,10 +1,3 @@
-import sys
-import os
-
-#hash base taken from lab 04
-# This allows 'from linked_list' to work no matter where you run the code from.
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 from .linked_list import linked_list
 
 class hash_table:
@@ -28,6 +21,7 @@ class hash_table:
     #THIS MIGHT NOT WORK BECAUSE OF INTEGERS
     def hash_function(self, key):
         #Position sensitive hash function. Mods each character by its position
+        key = str(key)       # force string
         s = 0
         it = 1
         for ch in key:
@@ -36,4 +30,6 @@ class hash_table:
             it += 1
         return s%self.array_len
  
-    def extract_key  (self, value): return None
+    def extract_key(self, value): 
+        raise NotImplementedError
+        

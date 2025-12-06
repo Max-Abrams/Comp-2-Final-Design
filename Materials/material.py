@@ -1,6 +1,6 @@
 import sys
 import os
-from spacegroup import SpaceGroup
+from .spacegroup import SpaceGroup
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 

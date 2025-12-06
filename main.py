@@ -1,8 +1,9 @@
 from datastructures.hash_table import hash_table
+from datastructures.linked_list import linked_list
 from algorithms.hash_search import lookup
 from Materials.material import Material
+from Materials.spacegroup import SpaceGroup
 from databases.MaterialDB import db
-from datastructures.linked_list import linked_list
 
 class MaterialHashTable(hash_table):
     def extract_key(self, value): 
