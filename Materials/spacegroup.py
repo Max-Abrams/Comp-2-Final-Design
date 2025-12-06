@@ -1,5 +1,3 @@
-# materials/spacegroup.py
-
 class SpaceGroup:
     def __init__(self, data_row):
         self.symbol = data_row["spg_symbol"]
