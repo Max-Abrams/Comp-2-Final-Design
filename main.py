@@ -16,7 +16,7 @@ class MaterialHashTable(hash_table):
 if __name__ == "__main__":
     #Instantiating data structures
     ht = MaterialHashTable(200)
-    energy_bst = bst(key_extractor=lambda m: m.density)
+    density_bst = bst(key_extractor=lambda m: m.density)
     atom_bf = BloomFilter(1000, 3, [hash_fn_3, hash_fn_4, hash_fn_5, hash_fn_1, hash_fn_2]) 
 
     # load the db--- ONCE!
@@ -24,7 +24,7 @@ if __name__ == "__main__":
         mat = Material(row)
         ht.insert(mat)
 
-        energy_bst.insert(mat)
+        density_bst.insert(mat)
 
         #Need to insert each atom in the last into bf
         #so loop through
@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
 
     low, high = 5.4192, 5.4315
-    results = energy_bst.range_query(low, high)
+    results = density_bst.range_query(low, high)
 
     print(f"BST range query: density between [{low}, {high}]")
     print("Total count of materials that satisfy the search criteria:", len(results))
