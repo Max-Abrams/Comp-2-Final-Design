@@ -6,7 +6,7 @@ from Materials.material import Material
 from Materials.spacegroup import SpaceGroup
 from databases.MaterialDB import db
 from algorithms.bloom_search import contains as bf_search
-from datastructures.bloom_filter import BloomFilter
+from datastructures.bloom_filter import BloomFilter, hash_fn_1, hash_fn_2, hash_fn_3, hash_fn_4, hash_fn_5
 
 
 class MaterialHashTable(hash_table):
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     #Instantiating data structures
     ht = MaterialHashTable(200)
     energy_bst = bst(key_extractor=lambda m: m.density)
-    atom_bf = BloomFilter(1000, 3) 
+    atom_bf = BloomFilter(1000, 3, [hash_fn_3, hash_fn_4, hash_fn_5, hash_fn_1, hash_fn_2]) 
 
     # load the db--- ONCE!
     for i, row in db.df.iterrows():
@@ -59,14 +59,14 @@ if __name__ == "__main__":
 
 
     #Bloom search
-    test = bf_search("Na")
+    test = bf_search(atom_bf, "Na")
     if test: 
         print("I mean, it's probably here!")
     else:
         print("DEF not!")
 
     #Bloom search
-    test = bf_search("Ar")
+    test = bf_search(atom_bf, "Ar")
     if test: 
         print("I mean, it's probably here!")
     else:
