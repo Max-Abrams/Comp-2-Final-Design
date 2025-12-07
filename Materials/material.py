@@ -13,19 +13,24 @@ from databases.MaterialDB import db
 
 class Material:
     #I presume we are keying this by formula name. The IDs are kind of weird and non-user friedly
-    def __init__(self, formula_name, data_row = None):
-        self.name = formula_name
-        
+    def __init__(self, data_row = None):
+        self.name = data_row['formula']
+    
+
+    #OLD LOOKUP BY FORMULA NAME, didnt use hash 
+
         # Only search the DB if data_row wasn't passed in
-        if data_row is None:
+        #if data_row is None:
             #unfortunatley some formulas appear twice, so we need to handle that
             #Also need to handle the case where no matches are found. Thats an easy error handle
 
-
-            #so later this look up will by handled using a Hash Table
-            matches = db.df[db.df['formula'] == formula_name]
+            #accesses column "formula" in df, then checks for the searched formula name, then saves that value
+            #matches = db.df[db.df['formula'] == formula_name]
             #Extract the first row found. 
-            data_row = matches.iloc[0]
+            #data_row = matches.iloc[0]
+
+        ####
+
 
         # 4. Assign attributes from the row
         self.density = data_row['density']
