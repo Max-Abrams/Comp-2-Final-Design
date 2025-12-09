@@ -1,8 +1,10 @@
 from datastructures.hash_table import hash_table
 from datastructures.linked_list import linked_list
 from datastructures.bst import bst
+from datastructures.heap import MinBinaryHeap
 from algorithms.hash_search import lookup as hash_lookup
 from algorithms.heap_sort import heapSorter
+from algorithms.top_k import top_k
 from Materials.material import Material
 from Materials.spacegroup import SpaceGroup
 from databases.MaterialDB import db
@@ -21,10 +23,11 @@ if __name__ == "__main__":
     atom_bf = BloomFilter(1000, 3, [hash_fn_3, hash_fn_4, hash_fn_5, hash_fn_1, hash_fn_2]) 
 
     # load the db--- ONCE!
+    all_materials = []
     for i, row in db.df.iterrows():
         mat = Material(row)
+        all_materials.append(mat)
         ht.insert(mat)
-
         density_bst.insert(mat)
 
         #Need to insert each atom in the last into bf
@@ -92,3 +95,12 @@ if __name__ == "__main__":
         print("I mean, it's probably here!")
     else:
         print("DEF not!")
+
+
+    # test heap data structure on top-k
+    # use '-m.density' for max-heap behavior and smallest densities
+    k=8
+    best = top_k(all_materials, k=k, pull_val=lambda m: m.density)
+    print(f"\nTop {k} highest density materials from BST range query:")
+    for m in best:
+        print(f"{m.formula}: {m.density}")
