@@ -1,5 +1,6 @@
 from datastructures.heap import MinBinaryHeap
 
+# basic algo to get top k items from the heap
 def top_k(iterable: list, k: int, pull_val) -> list:
     heap = MinBinaryHeap()
 
