@@ -45,8 +45,8 @@ class Material:
         self.space_group = SpaceGroup(data_row)
 
     def display(self):
-        print(f"found!! \n<Material: {self.name}, Density: {self.density}, Formula: {self.formula}>")
-        print("Atoms contained:\n")
+        print(f"\nMaterial found! \n\nMaterial: {self.name}\nId: {self.data_id}\nDensity: {self.density}\nMagnetic Moment: {self.moment}\nSpace Group: {self.space_group.symbol} ({self.space_group.number})\n")
+        print("Atoms contained:")
         for atom in self.clean_atoms:
             print(f"- {atom}")
         return "Done"

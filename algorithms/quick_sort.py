@@ -1,7 +1,8 @@
-# boilerplate quick sort from lab 8
+# Quick sort from lab 8
 import random
 
-def base_sort(arr: list) -> list:
+#need to add a key so we can extract based on a specific attribute
+def base_sort(arr: list, key=lambda x: x):
     """
     The default sorting algorithm to use when no special pattern is detected.
     Args:
@@ -17,7 +18,8 @@ def base_sort(arr: list) -> list:
         pivot = arr[high]
         i = low - 1
         for j in range(low, high):
-            if arr[j] <= pivot:
+            #Here, we are now comparinq based on the key the user provides
+            if key(arr[j]) <= key(pivot):
                 i += 1
                 arr[i], arr[j] = arr[j], arr[i]
         arr[i+1], arr[high] = arr[high], arr[i+1]
