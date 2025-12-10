@@ -11,15 +11,41 @@ from databases.MaterialDB import db
 from algorithms.bloom_search import contains as bf_search
 from datastructures.bloom_filter import BloomFilter, hash_fn_1, hash_fn_2, hash_fn_3, hash_fn_4, hash_fn_5
 from algorithms.quick_sort import base_sort
+import time
+
+
+class MaterialHashTable(hash_table):
+    def extract_key(self, value): 
+        return value.name
+    
+from datastructures.hash_table import hash_table
+from datastructures.linked_list import linked_list
+from datastructures.bst import bst
+from datastructures.heap import MinBinaryHeap
+from algorithms.hash_search import lookup as hash_lookup
+from algorithms.heap_sort import heapSorter
+from algorithms.top_k import top_k
+from Materials.material import Material
+from Materials.spacegroup import SpaceGroup
+from databases.MaterialDB import db
+from algorithms.bloom_search import contains as bf_search
+from datastructures.bloom_filter import BloomFilter, hash_fn_1, hash_fn_2, hash_fn_3, hash_fn_4, hash_fn_5
+from algorithms.quick_sort import base_sort
+import time
 
 
 class MaterialHashTable(hash_table):
     def extract_key(self, value): 
         return value.name
 
+class SpaceGroupHashTable(hash_table):
+    def extract_key(self, value):
+        return value.space_group.number
+
 if __name__ == "__main__":
     #Instantiating data structures
     ht = MaterialHashTable(200)
+    sg_ht = SpaceGroupHashTable(100)
     density_bst = bst(key_extractor=lambda m: m.density)
     atom_bf = BloomFilter(1000, 3, [hash_fn_3, hash_fn_4, hash_fn_5, hash_fn_1, hash_fn_2]) 
 
@@ -29,7 +55,8 @@ if __name__ == "__main__":
         mat = Material(row)
         all_materials.append(mat)
         ht.insert(mat)
-        density_bst.insert(mat)
+        sg_ht.insert(mat)
+        #density_bst.insert(mat)
 
         #Need to insert each atom in the last into bf
         #so loop through
@@ -116,7 +143,7 @@ if __name__ == "__main__":
         print("\n")
         print("Hello, esteemed material scientist! How can I help you today?\n")
         print("Please enter a number corresponding to your desired action:")
-        print("1: Lookup material by name.")
+        print("1: Lookup material by name or spacegroup.")
         print("2: Find a range of materials, based on your desired attribute.")
         print("3: Find top-rated material, based on your desired attribute.")
         print("4: Do a QUICK search, to see if a material with your desired atom might exist.")
@@ -126,12 +153,43 @@ if __name__ == "__main__":
         choice = input("Enter your choice: ")
 
         if choice == '1':
-            new_mat_in = input("\nPlease enter what material you would like to find: ")
-            new_mat = hash_lookup(ht, new_mat_in)
-            if new_mat: 
-                new_mat[0].display()
-            else:
-                print("Material not found. Please try again.\n")
+            m_or_s = input("Would you like to find a Material or Space Group? (m/s): ").lower()
+            if m_or_s == "m":
+                new_mat_in = input("\nPlease enter what material you would like to find: ")
+                new_mat = hash_lookup(ht, new_mat_in)
+                if new_mat: 
+                    new_mat[0].display()
+                    time.sleep(2)
+                else:
+                    print("Material not found. Please try again.\n")
+                    time.sleep(2)
+                    
+            
+            elif m_or_s == "s":
+                sg_in = int(input("\nPlease enter the space group number you would like to find: "))
+                try:
+                    sg_num = int(sg_in)
+                    disp = int(input("How many materials should I display: "))
+                    
+                    # Use the NEW hash search here
+                    found_materials = hash_lookup(sg_ht, sg_num)
+                    
+                    if found_materials:
+                        count = 0
+                        print(f"\nFound {len(found_materials)} materials in Space Group {sg_num}:")
+                        for mat in found_materials:
+                            if count < disp:
+                                print(f"- {mat.formula} (ID: {mat.data_id})")
+                                count +=1
+                        time.sleep(2)
+                    else:
+                        print(f"\nNo materials found in Space Group {sg_num}.\n")
+                        time.sleep(2)
+                        
+                except ValueError:
+                    print("Invalid space group number. Please try again.\n")
+                    time.sleep(2)
+
         elif choice == '2':
             print("\nOn which attribute would you like to perform your ranged query?\n")
             print("Please enter a number:")
@@ -160,6 +218,7 @@ if __name__ == "__main__":
             print("\nTotal count of materials that satisfy the search criteria:\n", len(results))             #CANT HANDLE NEGATIVES?
             for m in results[:num]:
                 print(m.formula, m.density)
+                time.sleep(2)
             print("\n")
 
         elif choice == '3':
@@ -195,16 +254,20 @@ if __name__ == "__main__":
                         count += 1
                         if count == k:
                             break
+                time.sleep(2)
 
             except ValueError:
                 print("Invalid number.")
+                time.sleep(2)
 
         elif choice == '4':
             atom_in = input("\nEnter the element you are looking for! (e.g. 'Na'): ")
             if bf_search(atom_bf, atom_in):
                 print(f"Bloom Filter: Element '{atom_in}' is PROBABLY present.")
+                time.sleep(2)
             else:
                 print(f"Bloom Filter: Element '{atom_in}' is DEFINITELY NOT present.")
+                time.sleep(2)
 
         elif choice == '5':
             print("\nWhat median value are you searching for?:")
@@ -235,9 +298,12 @@ if __name__ == "__main__":
             if attr_choice == '1': print(f"Density: {mid_mat.density}")
             elif attr_choice == '2': print(f"Moment: {mid_mat.moment}")
             elif attr_choice == '3': print(f"Energy: {mid_mat.energy}")
+            time.sleep(2)
 
         elif choice == '0':
             print("Exiting program. Goodbye!")
+            time.sleep(2)
             break
         else:
             print("Sorry, I didn't understand that choice. Please try again.")
+            time.sleep(2)
