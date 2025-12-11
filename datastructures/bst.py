@@ -42,7 +42,12 @@ class bst:
         if curr_node is None:
             return
     
-        k = curr_node.key[0] # grab numeric part of tuple only
+        # grab numeric part of tuple only, if key is a tuple
+        if isinstance(curr_node.key, tuple):
+            k = curr_node.key[0]
+        else:
+          k = curr_node.key
+
         if low <= k:
             self.range_query_recursive(curr_node.left, low, high, result)
         if low <= k <= high:
