@@ -17,26 +17,6 @@ import time
 class MaterialHashTable(hash_table):
     def extract_key(self, value): 
         return value.name
-    
-from datastructures.hash_table import hash_table
-from datastructures.linked_list import linked_list
-from datastructures.bst import bst
-from datastructures.heap import MinBinaryHeap
-from algorithms.hash_search import lookup as hash_lookup
-from algorithms.heap_sort import heapSorter
-from algorithms.top_k import top_k
-from Materials.material import Material
-from Materials.spacegroup import SpaceGroup
-from databases.MaterialDB import db
-from algorithms.bloom_search import contains as bf_search
-from datastructures.bloom_filter import BloomFilter, hash_fn_1, hash_fn_2, hash_fn_3, hash_fn_4, hash_fn_5
-from algorithms.quick_sort import base_sort
-import time
-
-
-class MaterialHashTable(hash_table):
-    def extract_key(self, value): 
-        return value.name
 
 class SpaceGroupHashTable(hash_table):
     def extract_key(self, value):
@@ -205,7 +185,12 @@ if __name__ == "__main__":
                 key_extractor = lambda m: m.density
                 searched_val = "density"
             elif attr_choice == '2':
-                key_extractor = lambda m: m.moment
+                # ignores the na cases
+                def moment_key(m):
+                    if m.moment is None:
+                        return None
+                    return (m.moment, m.data_id)
+                key_extractor = moment_key
                 searched_val = "moment"
             elif attr_choice == '3':
                 key_extractor = lambda m: m.energy
@@ -213,12 +198,16 @@ if __name__ == "__main__":
             low = float(input("Enter the lower bound of the range: "))
             high = float(input("Enter the upper bound of the range: "))
             user_bst = bst(key_extractor)
-            results = bst.range_query(low, high)
+            # populate the BST
+            for m in all_materials:
+                val = key_extractor(m)
+                if val is not None:
+                    user_bst.insert(m)
+            results = user_bst.range_query(low, high)
             print(f"BST range query: {searched_val} between [{low} and {high}]")
             print("\nTotal count of materials that satisfy the search criteria:\n", len(results))             #CANT HANDLE NEGATIVES?
             for m in results[:num]:
-                print(m.formula, m.density)
-                time.sleep(2)
+                print(m.formula, key_extractor(m))
             print("\n")
 
         elif choice == '3':

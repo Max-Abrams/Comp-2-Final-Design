@@ -25,10 +25,10 @@ class bst:
         key_pull = self.key_extractor(val)
         if root is None:
             return self.node(val, key_pull)
-        if key_pull > root.key:
-            root.right = self.insert_recursive(root.right , val)
-        else:
+        if key_pull < root.key:
             root.left = self.insert_recursive(root.left , val)
+        else:
+            root.right = self.insert_recursive(root.right , val)
         return root
 
     # insert method used to call insert_recursive method, avoids user needing to handle a root attribute
@@ -41,11 +41,13 @@ class bst:
     def range_query_recursive(self, curr_node: Optional[node], low: int, high: int, result: list) -> None:
         if curr_node is None:
             return
-        if low <= curr_node.key:
+    
+        k = curr_node.key[0] # grab numeric part of tuple only
+        if low <= k:
             self.range_query_recursive(curr_node.left, low, high, result)
-        if low <= curr_node.key <= high:
+        if low <= k <= high:
             result.append(curr_node.val)
-        if curr_node.key <= high:
+        if k <= high:
             self.range_query_recursive(curr_node.right, low, high, result)
 
     # range query method called by user
@@ -61,9 +63,11 @@ class bst:
     def search_recursive(self, curr_node=None, search_val=0) -> bool:
         if curr_node is None:
             return False
-        if curr_node.key == search_val:
+
+        k = curr_node.key[0] if isinstance(curr_node.key, tuple) else curr_node.key
+        if k == search_val:
             return True
-        if search_val > curr_node.key:
+        if search_val > k:
             return self.search_recursive(curr_node.right, search_val)
         else:
             return self.search_recursive(curr_node.left, search_val)
