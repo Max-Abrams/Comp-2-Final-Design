@@ -1,6 +1,7 @@
 import sys
 import os
 from .spacegroup import SpaceGroup
+from databases.MaterialDB import db
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -9,7 +10,13 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from databases.MaterialDB import db
+
+def clean_na(x):
+    try:
+        return float(x)
+    except:
+        return None
+
 
 class Material:
     #I presume we are keying this by formula name. The IDs are kind of weird and non-user friedly
@@ -33,15 +40,15 @@ class Material:
 
 
         # 4. Assign attributes from the row
-        self.density = data_row['density']
+        self.density = clean_na(data_row.get("density"))
         self.data_id = data_row['jid']
         self.formula = data_row['formula']
-        self.moment = data_row['magmom_oszicar']
+        self.moment = clean_na(data_row.get("magmom_oszicar"))
         #made into a set to avoid dubplicates
         self.atoms = set(data_row['atoms.elements'].split(','))
         #also need to get rid of annoying brackets
         self.clean_atoms = set([atom.strip().strip("[]'") for atom in self.atoms])
-
+        self.energy = clean_na(data_row.get("optb88vdw_total_energy"))
         self.space_group = SpaceGroup(data_row)
 
     def display(self):
