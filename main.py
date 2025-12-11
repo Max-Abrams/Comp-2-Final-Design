@@ -121,6 +121,7 @@ if __name__ == "__main__":
     print("Data loading complete.")
     while True:
         print("\n")
+        print("============================================================")
         print("Hello, esteemed material scientist! How can I help you today?\n")
         print("Please enter a number corresponding to your desired action:")
         print("1: Lookup material by name or spacegroup.")
@@ -129,6 +130,8 @@ if __name__ == "__main__":
         print("4: Do a QUICK search, to see if a material with your desired atom might exist.")
         print("5: Find the median material, based on your desired attribute.")
         print("0: Exit program.")
+        print("============================================================")
+        print("\n")
 
         choice = input("Enter your choice: ")
 
@@ -139,10 +142,10 @@ if __name__ == "__main__":
                 new_mat = hash_lookup(ht, new_mat_in)
                 if new_mat: 
                     new_mat[0].display()
-                    time.sleep(2)
+                    input("Press enter to return.")
                 else:
                     print("Material not found. Please try again.\n")
-                    time.sleep(2)
+                    input("Press enter to return.")
                     
             
             elif m_or_s == "s":
@@ -151,7 +154,7 @@ if __name__ == "__main__":
                     sg_num = int(sg_in)
                     disp = int(input("How many materials should I display: "))
                     
-                    # Use the NEW hash search here
+                    
                     found_materials = hash_lookup(sg_ht, sg_num)
                     
                     if found_materials:
@@ -161,14 +164,14 @@ if __name__ == "__main__":
                             if count < disp:
                                 print(f"- {mat.formula} (ID: {mat.data_id})")
                                 count +=1
-                        time.sleep(2)
+                        input("\nPress enter to return.")
                     else:
                         print(f"\nNo materials found in Space Group {sg_num}.\n")
-                        time.sleep(2)
+                        input("Press enter to return.")
                         
                 except ValueError:
                     print("Invalid space group number. Please try again.\n")
-                    time.sleep(2)
+                    input("Press enter to return.")
 
         elif choice == '2':
             print("\nOn which attribute would you like to perform your ranged query?\n")
@@ -214,10 +217,12 @@ if __name__ == "__main__":
                     user_bst.insert(m)
             results = user_bst.range_query(low, high)
             print(f"BST range query: {searched_val} between [{low} and {high}]")
-            print("\nTotal count of materials that satisfy the search criteria:\n", len(results))             #CANT HANDLE NEGATIVES?
+            print("\nTotal count of materials that satisfy the search criteria:", len(results))
+            print("\n\n")             
             for m in results[:num]:
                 print(m.formula, key_extractor(m))
-            print("\n")
+            print("\n") 
+            input("\nPress enter to return.")
 
         elif choice == '3':
             print("\nFind top-rated material based on:")
@@ -255,20 +260,21 @@ if __name__ == "__main__":
                         count += 1
                         if count == k:
                             break
-                time.sleep(2)
+                input("Press enter to return.")
 
             except ValueError:
                 print("Invalid number.")
-                time.sleep(2)
+                input("Press enter to return.")
 
         elif choice == '4':
             atom_in = input("\nEnter the element you are looking for! (e.g. 'Na'): ")
             if bf_search(atom_bf, atom_in):
                 print(f"Bloom Filter: Element '{atom_in}' is PROBABLY present.")
-                time.sleep(2)
+                input("Press enter to return.")
+
             else:
                 print(f"Bloom Filter: Element '{atom_in}' is DEFINITELY NOT present.")
-                time.sleep(2)
+                input("Press enter to return.")
 
         elif choice == '5':
             print("\nWhat median value are you searching for?:")
@@ -296,18 +302,20 @@ if __name__ == "__main__":
                 continue
 
             print("Sorting...")
+            print("\n")
             sorted_materials = base_sort(data, key=sort_key)
             median_index = len(sorted_materials) // 2
             mid_mat = sorted_materials[median_index]
+        
+            print(f"Median material: {mid_mat.formula}")   
 
-            print(f"Median material: {mid_mat.formula}")
-            
             # Print the value to confirm
             if attr_choice == '1': print(f"Density: {mid_mat.density}")
             elif attr_choice == '2': print(f"Moment: {mid_mat.moment}")
             elif attr_choice == '3': print(f"Energy: {mid_mat.energy}")
             elif attr_choice == '4': print(f"SLME: {mid_mat.slme}")
-            time.sleep(2)
+            print("\n") 
+            input("Press enter to return.")
 
         elif choice == '0':
             print("Exiting program. Goodbye!")
@@ -315,4 +323,4 @@ if __name__ == "__main__":
             break
         else:
             print("Sorry, I didn't understand that choice. Please try again.")
-            time.sleep(2)
+            input("Press enter to return.")
