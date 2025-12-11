@@ -176,9 +176,10 @@ if __name__ == "__main__":
             print("1: Density")
             print("2: Moment")
             print("3: Total Energy of system--usually negative!")
+            print("4: Spectroscopic Limited Maximum Efficiency (SLME)")
             attr_choice = input("Enter your choice: ")
             num = int(input("As a maximum, how many results would you like to see?\n"))
-            if attr_choice not in ['1', '2', '3']:
+            if attr_choice not in ['1', '2', '3', '4']:
                 print("Invalid choice. Returning to main menu.")
                 continue
             elif attr_choice == '1':
@@ -195,6 +196,14 @@ if __name__ == "__main__":
             elif attr_choice == '3':
                 key_extractor = lambda m: m.energy
                 searched_val = "total energy"
+            elif attr_choice == '4':
+                # ignores the na cases
+                def slme_key(m):
+                    if m.slme is None:
+                        return None
+                    return (m.slme, m.data_id)
+                key_extractor = slme_key
+                searched_val = "slme"
             low = float(input("Enter the lower bound of the range: "))
             high = float(input("Enter the upper bound of the range: "))
             user_bst = bst(key_extractor)
@@ -215,6 +224,7 @@ if __name__ == "__main__":
             print("1: Density")
             print("2: Moment")
             print("3: Total Energy")
+            print("4: Spectroscopic Limited Maximum Efficiency (SLME)")
             attr_choice = input("Enter your choice: ")
 
             if attr_choice == '1':
@@ -223,6 +233,8 @@ if __name__ == "__main__":
                 key_func = lambda m: m.moment
             elif attr_choice == '3':
                 key_func = lambda m: m.energy
+            elif attr_choice == '4':
+                key_func = lambda m: m.slme
             else:
                 print("Invalid choice.")
                 continue
@@ -263,21 +275,28 @@ if __name__ == "__main__":
             print("1: Density")
             print("2: Moment")
             print("3: Total Energy")
+            print("4: Spectroscopic Limited Maximum Efficiency (SLME)")
             attr_choice = input("Enter choice: ")
 
             # As above, needed to make this a stable search. It doesn't actually change time complexity much, after amortization
             if attr_choice == '1':
                 sort_key = lambda m: (m.density, m.data_id)
+                data = all_materials
             elif attr_choice == '2':
                 sort_key = lambda m: (m.moment, m.data_id)
+                data = [m for m in all_materials if m.moment is not None] #excludes na cases
             elif attr_choice == '3':
                 sort_key = lambda m: (m.energy, m.data_id)
+                data = all_materials
+            elif attr_choice == '4':
+                sort_key = lambda m: (m.slme, m.data_id)
+                data = [m for m in all_materials if m.slme is not None]
             else:
                 print("Invalid choice.")
                 continue
 
             print("Sorting...")
-            sorted_materials = base_sort(all_materials, key=sort_key)
+            sorted_materials = base_sort(data, key=sort_key)
             median_index = len(sorted_materials) // 2
             mid_mat = sorted_materials[median_index]
 
@@ -287,6 +306,7 @@ if __name__ == "__main__":
             if attr_choice == '1': print(f"Density: {mid_mat.density}")
             elif attr_choice == '2': print(f"Moment: {mid_mat.moment}")
             elif attr_choice == '3': print(f"Energy: {mid_mat.energy}")
+            elif attr_choice == '4': print(f"SLME: {mid_mat.slme}")
             time.sleep(2)
 
         elif choice == '0':

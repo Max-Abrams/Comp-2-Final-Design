@@ -44,6 +44,7 @@ class Material:
         self.data_id = data_row['jid']
         self.formula = data_row['formula']
         self.moment = clean_na(data_row.get("magmom_oszicar"))
+        self.slme = clean_na(data_row.get("slme"))
         #made into a set to avoid dubplicates
         self.atoms = set(data_row['atoms.elements'].split(','))
         #also need to get rid of annoying brackets
