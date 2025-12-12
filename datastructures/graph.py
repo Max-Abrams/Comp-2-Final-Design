@@ -1,68 +1,101 @@
-from collections import deque
+# datastructures/graph.py
+
+from collections import defaultdict, deque
+import numpy as np
+
 
 class Graph:
     def __init__(self):
-        # Adjacency list: {Material: [(NeighborMaterial, weight), ...]}
-        self.adjacency = {}
+        # adjacency list: material → list of (neighbor, weight)
+        self.adj = defaultdict(list)
 
-    def add_node(self, material):
-        """Ensure node exists in adjacency list."""
-        if material not in self.adjacency:
-            self.adjacency[material] = []
 
-    def add_edge(self, mat1, mat2, weight=1):
-        """
-        Add an undirected weighted edge between mat1 and mat2.
-        Avoids duplicate edges by checking existing neighbors.
-        """
-        self.add_node(mat1)
-        self.add_node(mat2)
+    def compute_similarity(self, m1, m2):
+        # Density similarity
+        if m1.density is None or m2.density is None:
+            density_sim = 0.0
+        else:
+            diff = abs(m1.density - m2.density)
+            density_sim = max(0, 1 - diff / 10)
 
-        # Insert edge mat1 -> mat2 if not already present
-        if not any(n == mat2 for n, _ in self.adjacency[mat1]):
-            self.adjacency[mat1].append((mat2, weight))
+        # Moment similarity
+        try:
+            if np.isnan(m1.moment) or np.isnan(m2.moment):
+                moment_sim = 0.0
+            else:
+                mdiff = abs(m1.moment - m2.moment)
+                moment_sim = max(0, 1 - mdiff / 10)
+        except:
+            moment_sim = 0.0
 
-        # Insert edge mat2 -> mat1 if not already present
-        if not any(n == mat1 for n, _ in self.adjacency[mat2]):
-            self.adjacency[mat2].append((mat1, weight))
+        # Space group match already guaranteed
+        sg_sim = 1.0
 
-    def get_neighbors(self, material):
-        """Return list of (neighbor, weight) pairs for a given material."""
-        return self.adjacency.get(material, [])
+        # Total similarity range: 0–3
+        return density_sim + moment_sim + sg_sim
 
-    def bfs(self, start, max_depth=None):
-        """
-        Breadth-first search:
-        Returns list of tuples (Material, depth) representing the
-        order and distance at which nodes are discovered.
-        """
-        if start not in self.adjacency:
-            return []
 
+    def add_edge(self, m1, m2, weight):
+        self.adj[m1].append((m2, weight))
+        self.adj[m2].append((m1, weight))
+
+
+    def build_similarity_graph(self, materials, threshold=2):
+        # 1. Group materials by space group number
+        sg_groups = defaultdict(list)
+        for m in materials:
+            sg_groups[m.space_group.number].append(m)
+
+        edges_created = 0
+
+        # 2. Compare pairwise ONLY inside each space group bucket
+        for sg, group in sg_groups.items():
+            n = len(group)
+            if n < 2:
+                continue  # cannot form edges
+
+            for i in range(n):
+                for j in range(i + 1, n):
+                    m1, m2 = group[i], group[j]
+
+                    # Compute similarity (SG match guaranteed here)
+                    sim = self.compute_similarity(m1, m2)
+
+                    # Create an edge if similarity passes threshold
+                    if sim >= threshold:
+                        self.add_edge(m1, m2, sim)
+                        edges_created += 1
+
+        return edges_created
+
+    def build_local_similarity_graph(self, materials, target, threshold=2):
+        target_sg = target.space_group.number
+        same_sg = [m for m in materials if m.space_group.number == target_sg]
+        edges_created = 0
+        for m in same_sg:
+            if m is target:
+                continue
+            sim = self.compute_similarity(target, m)
+            if sim >= threshold:
+                self.add_edge(target, m, sim)
+                edges_created += 1
+        return edges_created
+
+    def bfs(self, start):
         visited = set()
-        queue = deque([(start, 0)])
-        result = []
+        queue = deque([start])
+        visited.add(start)
 
         while queue:
-            node, depth = queue.popleft()
-
-            if node in visited:
-                continue
-
-            visited.add(node)
-            result.append((node, depth))
-
-            # Stop expanding if depth limit reached
-            if max_depth is not None and depth >= max_depth:
-                continue
-
-            # Add neighbors to queue
-            for neighbor, _ in self.adjacency[node]:
+            node = queue.popleft()
+            for neighbor, _ in self.adj[node]:
                 if neighbor not in visited:
-                    queue.append((neighbor, depth + 1))
+                    visited.add(neighbor)
+                    queue.append(neighbor)
 
-        return result
+        return visited
 
-    def __len__(self):
-        """Return number of nodes in graph."""
-        return len(self.adjacency)
+    def summary(self):
+        print(f"Graph has {len(self.adj)} materials.")
+        edge_count = sum(len(v) for v in self.adj.values()) // 2
+        print(f"Graph has {edge_count} undirected edges.")

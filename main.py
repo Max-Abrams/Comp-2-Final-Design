@@ -11,23 +11,25 @@ from databases.MaterialDB import db
 from algorithms.bloom_search import contains as bf_search
 from datastructures.bloom_filter import BloomFilter, hash_fn_1, hash_fn_2, hash_fn_3, hash_fn_4, hash_fn_5
 from algorithms.quick_sort import base_sort
+from datastructures.graph import Graph  # <-- NEW
 import time
 
 
 class MaterialHashTable(hash_table):
-    def extract_key(self, value): 
+    def extract_key(self, value):
         return value.name
 
 class SpaceGroupHashTable(hash_table):
     def extract_key(self, value):
         return value.space_group.number
 
+
 if __name__ == "__main__":
     #Instantiating data structures
     ht = MaterialHashTable(200)
     sg_ht = SpaceGroupHashTable(100)
     density_bst = bst(key_extractor=lambda m: m.density)
-    atom_bf = BloomFilter(1000, 3, [hash_fn_3, hash_fn_4, hash_fn_5, hash_fn_1, hash_fn_2]) 
+    atom_bf = BloomFilter(1000, 3, [hash_fn_3, hash_fn_4, hash_fn_5, hash_fn_1, hash_fn_2])
 
     # load the db--- ONCE!
     all_materials = []
@@ -36,87 +38,9 @@ if __name__ == "__main__":
         all_materials.append(mat)
         ht.insert(mat)
         sg_ht.insert(mat)
-        #density_bst.insert(mat)
 
-        #Need to insert each atom in the last into bf
-        #so loop through
         for atom in mat.clean_atoms:
-            #And just add
             atom_bf.add(atom)
-
-
-    # test hash search
-    #test = hash_lookup(ht, "DyB6")
-    #if test: 
-        #test[0].display()
-    #else:
-        #print("Material not found")
-
-    #test = hash_lookup(ht, "NaCl")
-    #if test: 
-     #   test[0].display()
-    #else:
-     #   print("Material not found")
-    #print("\n")
-
-    ## test BST range query
-    #low, high = 5.4192, 5.4315
-    #results = density_bst.range_query(low, high)
-
-    #print(f"BST range query: density between [{low} and {high}]")
-    #print("Total count of materials that satisfy the search criteria:", len(results))
-    #print("First 5 results:")
-    #for m in results[:5]:
-     #   print(m.formula, m.density)
-    #print("\n")
-    
-    
-    ## test HeapSort on densities
-    #density_list = []
-    #for i, row in db.df.iterrows():
-     #   mat = Material(row)
-      #  density_list.append((mat.density, mat.data_id, mat)) # ID added to (arbitrarily) break ties (ties=errors)
-
-    #sorted_pairs = heapSorter(density_list)
-
-    #printnum = 15
-    # find the longest formula so alignment is even
-    #max_formula_len = max(len(mat.formula) for _, _, mat in sorted_pairs[:printnum])
-
-    # print formatted output
-    #print(f"Heapsort: {printnum} lowest density materials:")
-    #for density, jid, mat in sorted_pairs[:printnum]:
-     #   print(f"{mat.formula:<{max_formula_len}}  {density:>10.4f}")
-    #print("\n")
-
-
-    #Bloom search
-    #test = bf_search(atom_bf, "Na")
-    #if test: 
-     #   print("I mean, it's probably here!")
-    #else:
-        #print("DEF not!")
-
-    #Bloom search
-    #test = bf_search(atom_bf, "Ar")
-    #if test: 
-     #   print("I mean, it's probably here!")
-    #else:
-     #   print("DEF not!")
-
-
-    # test heap data structure on top-k
-    # use '-m.density' for max-heap behavior and smallest densities
-    #k=8
-    #best = top_k(all_materials, k=k, pull_val=lambda m: m.density)
-    #print(f"\nTop {k} highest density materials from BST range query:")
-    #for m in best:
-     #   print(f"{m.formula}: {m.density}")
-
-    #test quick sort
-    #sorted_materials = base_sort(all_materials, key=lambda m: ((m.data_id, str(m.formula))))     #Tuple here because quick sort is unstable. So in equal cases, need to break ties
-    #median_index = len(sorted_materials) // 2
-    #print(f"Median material by formula (quick sort): {sorted_materials[median_index].formula}")
 
     print("Data loading complete.")
     while True:
@@ -129,6 +53,7 @@ if __name__ == "__main__":
         print("3: Find top-rated material, based on your desired attribute.")
         print("4: Do a QUICK search, to see if a material with your desired atom might exist.")
         print("5: Find the median material, based on your desired attribute.")
+        print("6: Build similarity graph and find similar materials.")  # <-- NEW
         print("0: Exit program.")
         print("============================================================")
         print("\n")
@@ -140,23 +65,21 @@ if __name__ == "__main__":
             if m_or_s == "m":
                 new_mat_in = input("\nPlease enter what material you would like to find: ")
                 new_mat = hash_lookup(ht, new_mat_in)
-                if new_mat: 
+                if new_mat:
                     new_mat[0].display()
                     input("Press enter to return.")
                 else:
                     print("Material not found. Please try again.\n")
                     input("Press enter to return.")
-                    
-            
+
             elif m_or_s == "s":
                 sg_in = int(input("\nPlease enter the space group number you would like to find: "))
                 try:
                     sg_num = int(sg_in)
                     disp = int(input("How many materials should I display: "))
-                    
-                    
+
                     found_materials = hash_lookup(sg_ht, sg_num)
-                    
+
                     if found_materials:
                         count = 0
                         print(f"\nFound {len(found_materials)} materials in Space Group {sg_num}:")
@@ -168,7 +91,7 @@ if __name__ == "__main__":
                     else:
                         print(f"\nNo materials found in Space Group {sg_num}.\n")
                         input("Press enter to return.")
-                        
+
                 except ValueError:
                     print("Invalid space group number. Please try again.\n")
                     input("Press enter to return.")
@@ -189,7 +112,6 @@ if __name__ == "__main__":
                 key_extractor = lambda m: m.density
                 searched_val = "density"
             elif attr_choice == '2':
-                # ignores the na cases
                 def moment_key(m):
                     if m.moment is None:
                         return None
@@ -200,7 +122,6 @@ if __name__ == "__main__":
                 key_extractor = lambda m: m.energy
                 searched_val = "total energy"
             elif attr_choice == '4':
-                # ignores the na cases
                 def slme_key(m):
                     if m.slme is None:
                         return None
@@ -210,7 +131,6 @@ if __name__ == "__main__":
             low = float(input("Enter the lower bound of the range: "))
             high = float(input("Enter the upper bound of the range: "))
             user_bst = bst(key_extractor)
-            # populate the BST
             for m in all_materials:
                 val = key_extractor(m)
                 if val is not None:
@@ -218,10 +138,10 @@ if __name__ == "__main__":
             results = user_bst.range_query(low, high)
             print(f"BST range query: {searched_val} between [{low} and {high}]")
             print("\nTotal count of materials that satisfy the search criteria:", len(results))
-            print("\n\n")             
+            print("\n\n")
             for m in results[:num]:
                 print(m.formula, key_extractor(m))
-            print("\n") 
+            print("\n")
             input("\nPress enter to return.")
 
         elif choice == '3':
@@ -247,7 +167,6 @@ if __name__ == "__main__":
             try:
                 k = int(input("How many top results? "))
                 for_dups = k * 20
-                #This BST prints a lot of duplicates. Need to fix that. 
                 best = top_k(all_materials, k=for_dups, pull_val=key_func)
                 avoid_dups = []
                 count = 0
@@ -284,13 +203,12 @@ if __name__ == "__main__":
             print("4: Spectroscopic Limited Maximum Efficiency (SLME)")
             attr_choice = input("Enter choice: ")
 
-            # As above, needed to make this a stable search. It doesn't actually change time complexity much, after amortization
             if attr_choice == '1':
                 sort_key = lambda m: (m.density, m.data_id)
                 data = all_materials
             elif attr_choice == '2':
                 sort_key = lambda m: (m.moment, m.data_id)
-                data = [m for m in all_materials if m.moment is not None] #excludes na cases
+                data = [m for m in all_materials if m.moment is not None]
             elif attr_choice == '3':
                 sort_key = lambda m: (m.energy, m.data_id)
                 data = all_materials
@@ -306,21 +224,50 @@ if __name__ == "__main__":
             sorted_materials = base_sort(data, key=sort_key)
             median_index = len(sorted_materials) // 2
             mid_mat = sorted_materials[median_index]
-        
-            print(f"Median material: {mid_mat.formula}")   
 
-            # Print the value to confirm
+            print(f"Median material: {mid_mat.formula}")
+
             if attr_choice == '1': print(f"Density: {mid_mat.density}")
             elif attr_choice == '2': print(f"Moment: {mid_mat.moment}")
             elif attr_choice == '3': print(f"Energy: {mid_mat.energy}")
             elif attr_choice == '4': print(f"SLME: {mid_mat.slme}")
-            print("\n") 
+            print("\n")
+            input("Press enter to return.")
+
+        elif choice == '6':
+            target_formula = input("Enter a material formula (e.g., SiO2): ").strip()
+            target = next((m for m in all_materials if m.formula == target_formula), None)
+            g = Graph()
+            print("Building similarity graph...")
+            
+            edges = g.build_local_similarity_graph(all_materials, target, threshold=1.5)
+            
+
+            print(f"Graph built with {edges} edges" )
+
+            target = next((m for m in all_materials if m.formula == target_formula), None)
+            if not target:
+                print(f"Material '{target_formula}' not found in dataset.")
+                input("Press enter to return.")
+                continue
+
+            visited = g.bfs(target)
+            print(f"Reachable materials: {len(visited)}")
+
+            neighbors = g.adj.get(target, [])
+            sorted_neighbors = sorted(neighbors, key=lambda x: x[1], reverse=True)
+
+            print("\nTop 5 similar materials:")
+            for neighbor, sim in sorted_neighbors[:5]:
+                print(f"{neighbor.formula}: similarity = {sim:.3f}")
+
             input("Press enter to return.")
 
         elif choice == '0':
             print("Exiting program. Goodbye!")
             time.sleep(2)
             break
+
         else:
             print("Sorry, I didn't understand that choice. Please try again.")
             input("Press enter to return.")
