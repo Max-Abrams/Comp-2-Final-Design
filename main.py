@@ -237,6 +237,10 @@ if __name__ == "__main__":
         elif choice == '6':
             target_formula = input("Enter a material formula (e.g., SiO2): ").strip()
             target = next((m for m in all_materials if m.formula == target_formula), None)
+            if not target:
+                print(f"Material '{target_formula}' not found in dataset.")
+                input("Press enter to return.")
+                continue
             g = Graph()
             print("Building similarity graph...")
             
