@@ -42,13 +42,13 @@ The goal of the project is to implement a materials database using custom-built 
 
 
 ## Data Structures and Algorithms Used
-Hash Table: O(1) lookup by material ID and space group
-Binary Search Tree (BST): Numeric range queries
-Heap (Min Binary Heap): Top-K queries
-Graph (Adjacency List): Material similarity relationships
-Bloom Filter: Fast probabilistic exclusion searches
-QuickSort: Fully ordered lists for median and full ranking. Average time complexity of O(n log n)
-HeapSort: Fully ordered lists with O(n log n) worst-case
+- Hash Table: O(1) lookup by material ID and space group
+- Binary Search Tree (BST): Numeric range queries
+- Heap (Min Binary Heap): Top-K queries
+- Graph (Adjacency List): Material similarity relationships
+- Bloom Filter: Fast probabilistic exclusion searches
+- QuickSort: Fully ordered lists for median and full ranking. Average time complexity of O(n log n)
+- HeapSort: Fully ordered lists with O(n log n) worst-case
 
 
 ## How to Run
