@@ -1,4 +1,7 @@
 #datastructures/heap.py
+
+# Sources: Main class colab, heapsort algo, and ChatGPT for adapation suggestions and error corrections
+
 from typing import Optional, Any
 
 ## Implementation of a min binary heap data structure

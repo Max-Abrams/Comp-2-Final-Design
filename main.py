@@ -157,7 +157,7 @@ if __name__ == "__main__":
             elif attr_choice == '2':
                 key_func = lambda m: m.moment
             elif attr_choice == '3':
-                key_func = lambda m: m.energy
+                key_func = lambda m: -m.energy
             elif attr_choice == '4':
                 key_func = lambda m: m.slme
             else:
@@ -174,7 +174,11 @@ if __name__ == "__main__":
                 for m in best:
                     if m.formula not in avoid_dups:
                         avoid_dups.append(m.formula)
-                        print(f"{count+1}: {m.formula} : {key_func(m)}")
+                        # For energy, print original value (ranking uses inverted key)
+                        if attr_choice == '3':
+                            print(f"{count+1}: {m.formula} : {m.energy}")
+                        else:
+                            print(f"{count+1}: {m.formula} : {key_func(m)}")
 
                         count += 1
                         if count == k:

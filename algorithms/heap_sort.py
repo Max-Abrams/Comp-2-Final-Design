@@ -1,7 +1,8 @@
 # algorithms/heap_sort.py
 
-## Implementation of max heap sort algorithm
+## Sources:  https://www.geeksforgeeks.org/dsa/heap-sort/ 
 
+## Implementation of max heap sort algorithm
 # Heapifies a subtree with root node 'i' which is an index in heap_array
 def heapifier(heap_array: list, n: int, i: int) -> None:
     # largest value = root
@@ -23,7 +24,7 @@ def heapifier(heap_array: list, n: int, i: int) -> None:
         heapifier(heap_array, n, largest)
 
 
-# Main function to do heap sort
+# Main function to do in-place heap sorting
 def heapSorter(heap_array: list) -> list:
     n = len(heap_array) # define size of array
 

@@ -1,6 +1,8 @@
+# datastructures/bst.py
+
 from typing import Optional, Callable
 
-# imported and adapted from lab 5
+# Sources: Lab 5 
 
 class bst:
 
