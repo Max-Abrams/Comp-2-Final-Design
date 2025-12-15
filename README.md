@@ -61,6 +61,7 @@ The goal of the project is to implement a materials database using custom-built 
 
 ### Installation
 From the project root directory, run:
+
     ```bash
     python -m pip install pandas numpy
     ```
