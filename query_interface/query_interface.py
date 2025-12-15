@@ -14,6 +14,8 @@ from algorithms.quick_sort import base_sort
 from datastructures.graph import Graph 
 import time
 
+
+#Calling the claasses for our hash tables here, not in main. This should save us some time and space later. 
 class MaterialHashTable(hash_table):
     def extract_key(self, value):
         return value.name
@@ -23,6 +25,7 @@ class SpaceGroupHashTable(hash_table):
         return value.space_group.number
 
 
+#our main query interface class
 class Query_Interface():
     def __init__(self, all_materials):
         self.all_materials = all_materials
@@ -62,8 +65,10 @@ class Query_Interface():
             if m.slme is not None: 
                 self.bst_slme.insert(m)
 
+    #start the interface
     def start(self):
         print("Data loading complete.")
+        #Ask the user which function they would like to use
         while True:
             print("\n")
             print("============================================================")
@@ -79,31 +84,45 @@ class Query_Interface():
             print("============================================================")
             print("\n")
 
+            #take their selection as input 
             choice = input("Enter your choice: ")
 
+            #If user selects 1, we go into our hash lookup
             if choice == '1':
+                #ask which type of lookup
                 m_or_s = input("Would you like to find a Material or Space Group? (m/s): ").lower()
+                #material lookup
                 if m_or_s == "m":
+                    #ask for formula, and then perform lookup
                     new_mat_in = input("\nPlease enter what material you would like to find: ")
                     new_mat = hash_lookup(self.ht, new_mat_in)
+                    #display result
                     if new_mat:
+                        #Print first result so they don't get a bunch of duplicates
                         new_mat[0].display()
                         input("Press enter to return.")
                     else:
+                        #error handle
                         print("Material not found. Please try again.\n")
                         input("Press enter to return.")
 
+                #spacegroup lookup
                 elif m_or_s == "s":
                     sg_in = int(input("\nPlease enter the space group number you would like to find: "))
                     try:
+                        #take input and convert to int
                         sg_num = int(sg_in)
+                        #There can be thousands in a SG, so we need to limit display
                         disp = int(input("How many materials should I display: "))
 
+                        #lookup
                         found_materials = hash_lookup(self.sg_ht, sg_num)
 
+                        #display results
                         if found_materials:
                             count = 0
                             print(f"\nFound {len(found_materials)} materials in Space Group {sg_num}:")
+                            #Keep track of our count
                             for mat in found_materials:
                                 if count < disp:
                                     print(f"- {mat.formula} (ID: {mat.data_id})")
@@ -119,6 +138,7 @@ class Query_Interface():
 
             #Now we can just use our pre-builts 
             elif choice == '2':
+                #Get bst type from user
                 print("\nOn which attribute would you like to perform your ranged query?\n")
                 print("Please enter a number:")
                 print("1: Density")
@@ -127,13 +147,18 @@ class Query_Interface():
                 print("4: Spectroscopic Limited Maximum Efficiency (SLME)")
                 attr_choice = input("Enter your choice: ")
                 num = int(input("As a maximum, how many results would you like to see?\n"))
+                #Error handle
                 if attr_choice not in ['1', '2', '3', '4']:
                     print("Invalid choice. Returning to main menu.")
                     continue
+                #Select bst based on user input. 
+                #So density if 1, moment if 2, energy if 3, slme if 4
                 elif attr_choice == '1':
                     user_bst = self.bst_density
+                    #Key parameter parameter for printing later
                     key_extractor = lambda m: m.density
                     searched_val = "density"
+                #Repeat for other attributes
                 elif attr_choice == '2':
                     user_bst = self.bst_moment
                     def moment_key(m):
@@ -154,8 +179,10 @@ class Query_Interface():
                         return (m.slme, m.data_id)
                     key_extractor = slme_key
                     searched_val = "slme"
+                #Get range from user
                 low = float(input("Enter the lower bound of the range: "))
                 high = float(input("Enter the upper bound of the range: "))
+                #Perform range query
                 results = user_bst.range_query(low, high)
                 print(f"BST range query: {searched_val} between [{low} and {high}]")
                 print("\nTotal count of materials that satisfy the search criteria:", len(results))
@@ -164,7 +191,8 @@ class Query_Interface():
                     print(m.formula, key_extractor(m))
                 print("\n")
                 input("\nPress enter to return.")
-
+            
+            #Choice 3: Top K
             elif choice == '3':
                 print("\nFind top-rated material based on:")
                 print("1: Density")
@@ -173,6 +201,7 @@ class Query_Interface():
                 print("4: Spectroscopic Limited Maximum Efficiency (SLME)")
                 attr_choice = input("Enter your choice: ")
 
+                #Select based on choice
                 if attr_choice == '1':
                     key_func = lambda m: m.density
                 elif attr_choice == '2':
@@ -186,6 +215,9 @@ class Query_Interface():
                     continue
 
                 try:
+                    #Had to handle duplicates here--some materials have same density/moment/energy/slme. 
+                    #We don't want to show the same formula multiple times.
+                    #So we pull more than k, then filter duplicates before displaying.
                     k = int(input("How many top results? "))
                     for_dups = k * 20
                     best = top_k(self.all_materials, k=for_dups, pull_val=key_func)
@@ -206,12 +238,16 @@ class Query_Interface():
                                 break
                     input("Press enter to return.")
 
+                #Error handling
                 except ValueError:
                     print("Invalid number.")
                     input("Press enter to return.")
 
+            #Bloom filter search
             elif choice == '4':
+                #Get input
                 atom_in = input("\nEnter the element you are looking for! (e.g. 'Na'): ")
+                #Perform bloom filter search. Def no, maybe yes
                 if bf_search(self.atom_bf, atom_in):
                     print(f"Bloom Filter: Element '{atom_in}' is PROBABLY present.")
                     input("Press enter to return.")
@@ -220,14 +256,17 @@ class Query_Interface():
                     print(f"Bloom Filter: Element '{atom_in}' is DEFINITELY NOT present.")
                     input("Press enter to return.")
 
+            #Median search
             elif choice == '5':
+                #Get usr choice
                 print("\nWhat median value are you searching for?:")
                 print("1: Density")
                 print("2: Moment")
                 print("3: Total Energy")
                 print("4: Spectroscopic Limited Maximum Efficiency (SLME)")
                 attr_choice = input("Enter choice: ")
-
+                
+                #Select based on choice. 1 for Density, etc. 
                 if attr_choice == '1':
                     sort_key = lambda m: (m.density, m.data_id)
                     data = self.all_materials
@@ -259,6 +298,7 @@ class Query_Interface():
                 print("\n")
                 input("Press enter to return.")
 
+            
             elif choice == '6':
                 #Prompt User for material
                 target_formula = input("Enter a material formula (e.g., SiO2): ").strip()

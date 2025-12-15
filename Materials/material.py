@@ -11,6 +11,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 
+#need a function that ignores N/A values and converts to float
 def clean_na(x):
     try:
         return float(x)
@@ -18,6 +19,7 @@ def clean_na(x):
         return None
 
 
+#This is our main class. Material, for use later. 
 class Material:
     #I presume we are keying this by formula name. The IDs are kind of weird and non-user friedly
     def __init__(self, data_row = None):
@@ -39,7 +41,7 @@ class Material:
         ####
 
 
-        # 4. Assign attributes from the row
+        #Assign attributes
         self._density = clean_na(data_row.get("density"))
         self._data_id = data_row['jid']
         self._formula = data_row['formula']
@@ -91,7 +93,7 @@ class Material:
     def slme(self):
         return self._slme
     
-        
+    #Display function to show/print material info later, in the CLI    
     def display(self):
         print(f"\nMaterial found! \n\nMaterial: {self.name}\nId: {self.data_id}\nDensity: {self.density}\nMagnetic Moment: {self.moment}\nSpace Group: {self.space_group.symbol} ({self.space_group.number})\n")
         print("Atoms contained:")

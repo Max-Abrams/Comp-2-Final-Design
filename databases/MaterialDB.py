@@ -4,6 +4,7 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "Materials.csv")
 
+#Databse class. The only thing this is doing is loading the CSV into a pandas dataframe
 class MaterialDatabase:
     def __init__(self, file_path):
         self.df = pd.read_csv(file_path, low_memory=False)
