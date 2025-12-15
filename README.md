@@ -74,8 +74,8 @@ python -m pip install pandas numpy
 ```bash
 python main.py
 ```
-    This will load the included materials dataset, build all required data structures, 
-    and launch the command-line interface.
+This will load the included materials dataset, build all required data structures, 
+and launch the command-line interface.
 
 
 ## Expected Output
