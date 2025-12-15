@@ -18,10 +18,10 @@ class hash_table:
         self.buffer[index].insert( self.node(key,value) )
         
     # must be defined by the inheriting class
-    #THIS MIGHT NOT WORK BECAUSE OF INTEGERS
     def hash_function(self, key):
         #Position sensitive hash function. Mods each character by its position
-        key = str(key)       # force string
+        #Force it into a string for safety. Was geteting crashes. 
+        key = str(key)     
         s = 0
         it = 1
         for ch in key:
