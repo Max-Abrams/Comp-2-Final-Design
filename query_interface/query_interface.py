@@ -284,13 +284,17 @@ class Query_Interface():
                 visited = g.bfs(target)
                 print(f"Reachable materials: {len(visited)}")
 
-                neighbors = g.adj.get(target, [])
-                sorted_neighbors = sorted(neighbors, key=lambda x: x[1], reverse=True)
+                idx = g.nodes.index(target)
+                neighbors = g.adj[idx]
+                sorted_neighbors = sorted(neighbors, key=lambda x: x[1], reverse=True)[:5]
 
                 print("\nTop 5 similar materials:")
-                for neighbor, sim in sorted_neighbors[:5]:
+                
+                for neighbor_idx, sim in sorted_neighbors:
+                    neighbor = g.nodes[neighbor_idx]
                     print(f"{neighbor.formula}: similarity = {sim:.3f}")
 
+                
                 input("Press enter to return.")
 
             elif choice == '0':
