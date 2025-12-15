@@ -22,6 +22,8 @@ if __name__ == "__main__":
         mat = Material(row)
         all_materials.append(mat)
 
+    #Instantiate the CLI
     cli = Query_Interface(all_materials)
 
+    #Start query interface
     cli.start()
