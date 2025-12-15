@@ -1,6 +1,7 @@
-databases/Materials.csv
+databases/Materials_big.csv
+trimmer.py
 venv/
 __pycache__/
 *.pyc
 .vscode/
-venv/
+.DS_Store
