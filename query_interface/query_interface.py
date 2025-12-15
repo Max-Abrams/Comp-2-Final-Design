@@ -260,36 +260,38 @@ class Query_Interface():
                 input("Press enter to return.")
 
             elif choice == '6':
+                #Prompt User for material
                 target_formula = input("Enter a material formula (e.g., SiO2): ").strip()
+                #Find material in db
                 target = next((m for m in self.all_materials if m.formula == target_formula), None)
+
+                #Error handling for material not found
                 if not target:
                     print(f"Material '{target_formula}' not found in dataset.")
                     input("Press enter to return.")
                     continue
+
+                #create graph object
                 g = Graph()
                 print("Building similarity graph...")
-                
-                edges = g.build_local_similarity_graph(self.all_materials, target, threshold=1.5)
-                
 
+                #Create edges within spacegroup with similarity threshold of <1.5
+                edges = g.build_local_similarity_graph(self.all_materials, target, threshold=1.5)
                 print(f"Graph built with {edges} edges" )
 
-                #Are we not calling for target twice here? 
-                #target = next((m for m in self.all_materials if m.formula == target_formula), None)
-                #if not target:
-                   # print(f"Material '{target_formula}' not found in dataset.")
-                    #input("Press enter to return.")
-                    #continue
-
+                #Start at target material and traverse all connected materials
                 visited = g.bfs(target)
                 print(f"Reachable materials: {len(visited)}")
 
+                #Find index of target in graph and save neighbors as idx
                 idx = g.nodes.index(target)
                 neighbors = g.adj[idx]
-                sorted_neighbors = sorted(neighbors, key=lambda x: x[1], reverse=True)[:5]
 
+                #Store top 5 neighbors and display
+                sorted_neighbors = sorted(neighbors, key=lambda x: x[1], reverse=True)[:5]
                 print("\nTop 5 similar materials:")
-                
+
+                #Convert indexes back to materials and print
                 for neighbor_idx, sim in sorted_neighbors:
                     neighbor = g.nodes[neighbor_idx]
                     print(f"{neighbor.formula}: similarity = {sim:.3f}")
