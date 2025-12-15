@@ -13,7 +13,7 @@ def top_k(iterable: list, k: int, pull_val) -> list:
         val = pull_val(i) #extract value to compare
         if val is None:
             continue
-        heap.push((val, i.data_id, i)) #tuple included use id to break ties and avoid comparison errors
+        heap.push((val, i.data_id, i)) #tuple included to allow use of id to break ties and avoid comparison errors
         if len(heap.data) > k: # build to size k
             heap.pop()
 

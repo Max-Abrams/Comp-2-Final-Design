@@ -81,7 +81,7 @@ class Material:
     
     @property
     def atoms(self):
-        return self._atoms
+        return self.clean_atoms
     
     @property
     def space_group(self):

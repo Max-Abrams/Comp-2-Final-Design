@@ -51,7 +51,7 @@ class Query_Interface():
             self.sg_ht.insert(m)
             
             # build the bloom
-            for atom in m.clean_atoms:
+            for atom in m.atoms:
                 self.atom_bf.add(atom)
 
             #Insert into the BSTs
@@ -59,7 +59,7 @@ class Query_Interface():
             self.bst_energy.insert(m)
             if m.moment is not None: 
                 self.bst_moment.insert(m)
-            if m._slme is not None: 
+            if m.slme is not None: 
                 self.bst_slme.insert(m)
 
     def start(self):
