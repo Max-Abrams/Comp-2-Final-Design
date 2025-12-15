@@ -62,17 +62,18 @@ The goal of the project is to implement a materials database using custom-built 
 ### Installation
 From the project root directory, run:
 
-    ```bash
-    python -m pip install pandas numpy
-    ```
+```bash
+python -m pip install pandas numpy
+```
 
 ### Running the Program
 1. Clone the repository and navigate into the project root directory.
 2. The program automatically loads the included CSV dataset from the `databases/` directory. No additional configuration is required.
 3. From the project root directory:
-        ```
-        python main.py
-        ```
+
+```bash
+python main.py
+```
     This will load the included materials dataset, build all required data structures, 
     and launch the command-line interface.
 
