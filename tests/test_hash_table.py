@@ -61,6 +61,7 @@ def main():
         #Count collisions (list buckets with >1 item)
         collisions = count_collisions(ht)
 
+        #Outputs
         print(f"Unique atoms stored: {len(atoms)}")
         print(f"Build time: {build_time:.2f} ms")
         print(f"Lookup time: {lookup_time:.5f} ms")

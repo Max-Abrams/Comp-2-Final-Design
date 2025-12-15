@@ -52,16 +52,19 @@ def evaluate_filter(bf, atoms, user_atom):
 
     fp_rate = (false_positives / total_negatives) * 100
 
-    # User requested lookup
+    #User input
     user_result = bf.contains(user_atom)
 
     return fp_rate, query_time, user_result
 
 
 def main():
-    print("\n==== BLOOM FILTER PERFORMANCE TEST ====\n")
-    user_atom = input("Enter an atom symbol to look up (example: O): ").strip()
 
+    #test outputs 
+    print("\n==== BLOOM FILTER PERFORMANCE TEST ====\n")
+
+    #user prompt for atom symbol
+    user_atom = input("Enter an atom symbol to look up (example: O): ").strip()
     test_sizes = [50, 500, 5000]
 
     for size in test_sizes:
@@ -70,19 +73,18 @@ def main():
         bf, atoms, build_time = build_filter(size)
         fp_rate, query_time, user_result = evaluate_filter(bf, atoms, user_atom)
 
+        #print times
         print(f"Unique atoms stored: {len(atoms)}")
         print(f"Build time: {build_time:.2f} ms")
         print(f"Query time: {query_time:.4f} ms")
         print(f"False Positive Rate: {fp_rate:.2f}%")
 
-        # Important: Explain Bloom filter logic to grader
+        #output results
         if user_result:
             print(f"\n{user_atom} is PROBABLY in the dataset.")
         else:
             print(f"\n{user_atom} is definitely NOT in the dataset.")
 
-    print("\n✓ Bloom Filter performance test complete!\n")
-
-
+   
 if __name__ == "__main__":
     main()

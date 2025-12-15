@@ -23,8 +23,7 @@ def sample_material_values(sample_size, attribute):
         mat = Material(data_row=row)
         val = getattr(mat, attribute, None)
 
-        #Skip invalid (None, NaN, strings like "na")
-        #Moment still not working.. may need to update material.py
+        #Skip invalid value for moment
         try:
             val = float(val)
         except:
@@ -37,7 +36,7 @@ def sample_material_values(sample_size, attribute):
 
 
 def main():
-    print("\n==== HEAP SORT INTERACTIVE TEST ====\n")
+    print("\n==== HEAP SORT TEST ====\n")
 
     #Provide user with valid attributes to search
     valid_attrs = get_valid_attributes()
@@ -65,18 +64,21 @@ def main():
             print(f"No valid values for attribute '{attribute}' in data sample.")
             continue
 
+        #log times 
         t0 = time.time()
         sorted_vals = heapSorter(values[:])  # keep original list intact
         sort_time = (time.time() - t0) * 1000  # ms
 
+        #time outputs and top and bottom value input
         print(f"Sort Time: {sort_time:.3f} ms")
         print(f"Lowest {attribute}:  {sorted_vals[0]:.3f}")
         print(f"Highest {attribute}: {sorted_vals[-1]:.3f}")
 
-        #rReverse sorted values to show highest first
+        #reverse sorted values to show highest first
         top_vals = list(reversed(sorted_vals))[:k]
         printed = set()
 
+        #Results output
         print(f"\nTop {k} materials by {attribute}:")
         for val in top_vals:
             for m in materials:
