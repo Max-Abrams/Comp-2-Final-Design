@@ -3,17 +3,18 @@
 # Sources: Main class colab, heapsort algo, and ChatGPT for adapation suggestions and error corrections
 
 from typing import Optional, Any
+from datastructures.dynamic_array import DynamicArray
 
 ## Implementation of a min binary heap data structure
 class MinBinaryHeap():
 
     # basic constructor
     def __init__(self) -> None:
-        self.data = []
+        self.data = DynamicArray()
 
     # peek at the minimum value of the heap
     def peek(self) -> Optional[Any]:
-        if not self.data:
+        if len(self.data) == 0:
             return None
         return self.data[0]
 
@@ -43,7 +44,7 @@ class MinBinaryHeap():
     
     # remove and return the minimum value from the heap
     def pop(self) -> Optional[Any]:
-        if not self.data:
+        if len(self.data) == 0:
             return None
         if len(self.data) == 1:
             return self.data.pop()
