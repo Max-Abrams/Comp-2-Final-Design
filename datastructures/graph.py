@@ -1,21 +1,32 @@
+from dynamic_array import DynamicArray
+from array_set import ArraySet
 from collections import deque
 import numpy as np
-
 
 class Graph:
     def __init__(self):
 
         #Init empty graph, nodes stores all materials, and adj stores all neighbors
-        self.nodes = []
-        self.adj = []
+        self.nodes = DynamicArray()
+        self.adj = DynamicArray()
 
 
     def _add_node(self, m):
 
         #Check if material is already in list, if not add
-        if m not in self.nodes:
-            self.nodes.append(m)
-            self.adj.append([])
+        for i in range(len(self.nodes)):
+            if self.nodes[i] == m:
+                return
+
+        self.nodes.append(m)
+        self.adj.append([])
+
+
+    def _get_index(self, m):
+        for i in range(len(self.nodes)):
+            if self.nodes[i] == m:
+                return i
+        return -1
 
 
     def _compute_similarity(self, m1, m2):
@@ -27,10 +38,10 @@ class Graph:
         if m1.density is None or m2.density is None:
             density_sim = 0.0
 
-        
+
         else:
             #Calculate absolute value of density delta
-            #Score from 0->1:  1-(|delta| / 10),closer  to 1 is higher similarity 
+            #Score from 0->1:  1-(|delta| / 10),closer  to 1 is higher similarity
             diff = abs(m1.density - m2.density)
             density_sim = max(0, 1 - diff / 10)
 
@@ -40,7 +51,7 @@ class Graph:
             if np.isnan(m1.moment) or np.isnan(m2.moment):
                 moment_sim = 0.0
 
-            
+
             else:
                 #Calculate absolute value of moment delta
                 #Score from 0->1: 1-(|delta| / 10), closer to 1 is higher similarity
@@ -50,7 +61,7 @@ class Graph:
         #Assign 0 score if error from pulling moment
         except:
             moment_sim = 0.0
-            
+
         #Assign similar space group score to 1
         sg_sim = 1.0
 
@@ -60,14 +71,14 @@ class Graph:
 
     def _add_edge(self, m1, m2, weight):
         #Build edges with similarity score
-        
+
         #Ensure both materials exist in the graph
         self._add_node(m1)
         self._add_node(m2)
 
         #Get index for each material
-        i = self.nodes.index(m1)
-        j = self.nodes.index(m2)
+        i = self._get_index(m1)
+        j = self._get_index(m2)
 
         #Add undirected edge between each material
         self.adj[i].append((j, weight))
@@ -91,7 +102,7 @@ class Graph:
                 if m1.space_group.number != m2.space_group.number:
                     continue
 
-                #Compute similarity 
+                #Compute similarity
                 sim = self._compute_similarity(m1, m2)
 
                 #Create an edge if similarity passes threshold
@@ -103,7 +114,7 @@ class Graph:
 
 
     def build_local_similarity_graph(self, materials, target, threshold=2):
-        
+
         #Add only target material as a node
         self._add_node(target)
         edges_created = 0
@@ -128,11 +139,11 @@ class Graph:
 
     def bfs(self, start):
         #Discover all materials that are connected through similarity
-        visited = set()
+        visited = ArraySet()
         queue = deque()
 
         #Convert starting material to index
-        start_idx = self.nodes.index(start)
+        start_idx = self._get_index(start)
         visited.add(start_idx)
         queue.append(start_idx)
 
@@ -141,15 +152,23 @@ class Graph:
 
             #Visit neighbors of current node
             for neighbor_idx, _ in self.adj[idx]:
-                if neighbor_idx not in visited:
+                if not visited.contains(neighbor_idx):
                     visited.add(neighbor_idx)
                     queue.append(neighbor_idx)
 
         #Return actual material objects
-        return {self.nodes[i] for i in visited}
+        result = DynamicArray()
+        for i in range(len(visited.data)):
+            idx = visited.data[i]
+            result.append(self.nodes[idx])
+
+        return result
 
 
     def summary(self):
         print(f"Graph has {len(self.nodes)} materials.")
-        edge_count = sum(len(v) for v in self.adj) // 2
+        edge_count = 0
+        for i in range(len(self.adj)):
+            edge_count += len(self.adj[i])
+        edge_count //= 2
         print(f"Graph has {edge_count} undirected edges.")
