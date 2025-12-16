@@ -1,7 +1,8 @@
-from dynamic_array import DynamicArray
-from array_set import ArraySet
-from collections import deque
+from .dynamic_array import DynamicArray
+from .array_set import ArraySet
+from .queue import Queue
 import numpy as np
+
 
 class Graph:
     def __init__(self):
@@ -136,34 +137,35 @@ class Graph:
 
         return edges_created
 
-
     def bfs(self, start):
         #Discover all materials that are connected through similarity
         visited = ArraySet()
-        queue = deque()
+        queue = Queue(len(self.nodes))
 
         #Convert starting material to index
         start_idx = self._get_index(start)
         visited.add(start_idx)
-        queue.append(start_idx)
+        queue.push(start_idx)
 
-        while queue:
-            idx = queue.popleft()
+        while queue.count() > 0:
+            idx = queue.pop()
 
             #Visit neighbors of current node
             for neighbor_idx, _ in self.adj[idx]:
                 if not visited.contains(neighbor_idx):
                     visited.add(neighbor_idx)
-                    queue.append(neighbor_idx)
+                    queue.push(neighbor_idx)
+ 
 
-        #Return actual material objects
+        
+                    #Return actual material objects
         result = DynamicArray()
         for i in range(len(visited.data)):
             idx = visited.data[i]
             result.append(self.nodes[idx])
 
         return result
-
+    
 
     def summary(self):
         print(f"Graph has {len(self.nodes)} materials.")

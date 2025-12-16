@@ -1,3 +1,5 @@
+from .dynamic_array import DynamicArray
+
 class ArraySet:
 
     

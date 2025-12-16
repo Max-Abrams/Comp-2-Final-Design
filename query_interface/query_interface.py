@@ -324,7 +324,7 @@ class Query_Interface():
                 print(f"Reachable materials: {len(visited)}")
 
                 #Find index of target in graph and save neighbors as idx
-                idx = g.nodes.index(target)
+                idx = g._get_index(target)
                 neighbors = g.adj[idx]
 
                 #Store top 5 neighbors and display
