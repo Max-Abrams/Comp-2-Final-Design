@@ -20,7 +20,7 @@ class Graph:
                 return
 
         self.nodes.append(m)
-        self.adj.append([])
+        self.adj.append(DynamicArray())
 
 
     def _get_index(self, m):
